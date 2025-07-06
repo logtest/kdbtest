@@ -7,9 +7,9 @@ import pandas as pd
 
 # use prepare_ml_daily_data_home.q to prepare the data in the kdb portal 21999
 kdbhost = 'localhost'
-q = qconnection.QConnection(kdbhost, port=21999, username='', password='', pandas=True)
+q = qconnection.QConnection(kdbhost, port=121, username='', password='', pandas=True)
 q.open()
-qkx = pykx.QConnection(kdbhost, port=21999, username='', password='')
+qkx = pykx.QConnection(kdbhost, port=121, username='', password='')
 data = qkx('`time`sym xasc select from d where not null rtn5, not null rtn5avg, ipodays>30').pd()
 
 
