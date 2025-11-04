@@ -1,0 +1,39 @@
+
+//---------  load lib -------------------
+LIB_DIR: 
+
+// q script starts here
+system "l ", LIB_DIR, "qTALIB.q";
+system "l ", LIB_DIR, "qSignal.q";
+
+\l C:/ccxt_trader/hdb/d1
+
+mysymlist:`$();
+mysymlistFX:`$();
+
+d:select from d1 where sym in mysymlist;
+`d upsert 2!select sym:`ALL, time, open:close, high:close,low:close, close from  update close:prds 1+rtn from select avg rtn by time from update rtn:-1+close%prev close by sym from d
+`d upsert 2!select sym:`FX, time, open:close, high:close,low:close, close from  update close:prds 1+rtn from select avg rtn by time from update rtn:-1+close%prev close by sym from select from d1 where sym in mysymlistFX
+
+
+/select below accordingly:
+d: update signal: MACD[close;12;26;15] by sym from d;
+d: update signal: (5 mavg volume) - 60 mavg volume by sym from d
+d: update signal: EMA[close;1]-EMA[close;30] by sym from d
+d: update signal:deltas MACD[close;12;26;30] by sym from d;
+
+
+
+.qsignal.eval_signal_sharpe[select from d where time.date>=2022.01.01;1;1]
+/.qsignal.eval_signal_sharpe[select from d where time.date>=2021.01.01;1;1]
+select time,PV1:PV, pv1:pv from .qsignal.eval_signal_all[select from d where time.date>=2022.01.01;1;1] where sym = `allrebalweek
+
+
+/d: d lj 1!select time,signal: MACD[close;12;26;15] from select from d where sym= idxname;
+
+
+// test 1. breakdown analysis by idxBias30
+// conclusion and observation:
+// 1. for MACD[12;26;15], don't either buy or sell using the signal when idxBias30<-500 bps, if idxBias30>1000 or idxBias1000>1500, don't SS
+my_summary_bps " by signalside, ( -1000. -500 0. 500 750 1000) bin idxBias30 from .qsignal.cross_signal_bench[select from d] "
+my_summary_bps " by signalside, ( -500 0. 500 750 1000) bin idxBias30 from .qsignal.cross_signal_bench[select from d where time.date>=2022.01.01] "
