@@ -6,7 +6,6 @@ LIB_DIR:
 system "l ", LIB_DIR, "qTALIB.q";
 system "l ", LIB_DIR, "qSignal.q";
 
-\l C:/ccxt_trader/hdb/d1
 
 mysymlist:`$();
 mysymlistFX:`$();
